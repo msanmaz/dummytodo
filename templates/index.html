@@ -5,11 +5,11 @@
     </head>
     <body>
 
-        <form method="post" action="/todos/create">
+        <form id="form">
             <input type="text" name="description" />
             <input type="submit" value="Create" />
           </form>
-          
+
         <ul>
             {% for d in data%}
             <li>
@@ -23,7 +23,12 @@
 
 
 
+     <script>
+         document.getElementById('form').onsubmit = function(e){
+             e.preventDefault();
 
+         }
+     </script>
 
 
     </body>
