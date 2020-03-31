@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 import sys
+from flask_migrate import Migrate
 
 
 app = Flask(__name__)
@@ -8,13 +9,15 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://m@localhost:5432/todosapp'
 db = SQLAlchemy(app)
 
+migrate = Migrate(app,db)
+
 
 # database model
 class Todo(db.Model):
     __tablename__ = 'todos'
     id = db.Column(db.Integer, primary_key=True)  # id of db's columns
     description = db.Column(db.String(), nullable=False)  # data itself
-
+    completed = db.Column(db.Boolean, nullable=False,default=False)
     def __repr__(self):  # debugging repr method
         return f'<Todo {self.id} {self.description}>'
 
@@ -45,4 +48,3 @@ def create_todo():
 @app.route('/')
 def index():
     return render_template('index.html', data=Todo.query.all()) ##include data from data base
-
