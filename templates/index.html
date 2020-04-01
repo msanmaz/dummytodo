@@ -4,6 +4,11 @@
         <title>Todo App</title>
     </head>
     <body>
+        <style>
+            ul li{
+                list-style: none;
+            }
+        </style>
 
         <form id="form">
             <input type="text" name="description" id="description" />
@@ -13,7 +18,8 @@
         <ul id="todos">
             {% for d in data%}
             <li>
-                {{d.description}}
+               <input class="checky" type="checkbox" {% if d.completed %} checked  {% endif %}/> 
+               {{d.description}}
             </li>
             {% endfor %}
         </ul>
@@ -28,6 +34,24 @@
     </style>
 
      <script>
+         const checkb = document.querySelectorAll('.checky');
+         for (i = 0; i < checkb.length ; i ++){
+             const checkbox = checkb[i];
+             checkbox.onchange = function(e) {
+                 console.log('event', e)
+                 const newCompleted = e.target.checked;
+                 fetch('/todos/set-completed',{
+                     method = 'POST',
+                     body: json.stringify({
+                         'completed': newCompleted
+                     }),
+                     headers:{
+                         'Content-Type' : 'application/json'
+                     }
+                 })
+             }
+         }
+
          document.getElementById('form').onsubmit = function(e){
              e.preventDefault();
              fetch('/todos/create', {
