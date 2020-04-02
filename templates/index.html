@@ -19,7 +19,7 @@
             {% for d in data%}
             <li>
                <input class="checky"  data-id="{{d.id}}" type="checkbox" {% if d.completed %} checked  {% endif %} >{{d.description}} 
-                 
+                <button class="btn" data-id="{{d.id}}">&cross;</button>
             </li>
             {% endfor %}
         </ul>
@@ -31,9 +31,30 @@
         .hidden{
             display: none;
         }
+        li button{
+           color: red;
+           cursor: pointer;
+       }
     </style>
 
      <script>
+         const btn = document.getElementsByClassName('btn');
+         for (i= 0; i < btn.length ; i++){
+             const batin = btn[i];
+             batin.onclick = function(e){
+                 console.log(e)
+                 const deletedId = e.toElement.dataset['id'];
+                 fetch('/todos/'+ deletedId+ '/delete',{
+                     method: 'DELETE',
+                     
+                 })
+             }
+         }
+
+
+
+
+
          const checkb = document.querySelectorAll('.checky');
          for (i = 0; i < checkb.length ; i ++){
              const checkbox = checkb[i];

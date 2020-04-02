@@ -55,7 +55,7 @@ def index():
 def setcomp(todo_id):
     try:
         completed = request.get_json()['completed']
-        print('completed',completed)
+        print('completed', completed)
         todo = Todo.query.get(todo_id)
         todo.completed = completed
         db.session.commit()
@@ -64,3 +64,15 @@ def setcomp(todo_id):
     finally:
         db.session.close()
     return redirect(url_for('index'))
+
+
+@app.route('/todos/<deletedId>/delete', methods=['DELETE'])
+def delete(deletedId):
+    try:
+        Todo.query.filter_by(id=deletedId).delete()
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+    return jsonify({'success': True})
