@@ -18,10 +18,17 @@ class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # id of db's columns
     description = db.Column(db.String(), nullable=False)  # data itself
     completed = db.Column(db.Boolean, nullable=False, default=False)
+    todo_list = db.Column(db.Integer, db.ForeignKey('todolists.id'), nullable=False)
 
     def __repr__(self):  # debugging repr method
         return f'<Todo {self.id} {self.description}>'
 
+
+class TodoList(db.Model):
+    __tablename__ = 'todolists'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(), nullable=False)
+    todos = db.relationship('Todo', backref='list', lazy=True)
 
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
