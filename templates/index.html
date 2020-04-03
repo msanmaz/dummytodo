@@ -2,6 +2,8 @@
 <html>
     <head>
         <title>Todo App</title>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
     </head>
     <body>
         <style>
@@ -9,35 +11,52 @@
                 list-style: none;
             }
         </style>
+        <div class="container">
+            <div class="row">
+                <div class="lists-wrapper col-6">
+                    <h4>{{ active_list.name }}</h4>
+                    <form id="formList">
+                        <input type="text" id="listUpdate" name="listUpdate">
+                        <input type="submit" value="Update" class="btn btn warning">
+                    </form>
+                    <ul id="lists">
+                      {% for list in lists %}
+                      <li>
+                        <input class="check-list" type="checkbox"  />
+                        <a href="/lists/{{ list.id }}">
+                          {{ list.name }}
+                        </a>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
 
-<div class="lists-wrapper">
-    <ul id="lists">
-      {% for list in lists %}
-      <li>
-        <a href="/lists/{{ list.id }}">
-          {{ list.name }}
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-  <div class="todos-wrapper">
-    <h4>{{ active_list.name }}</h4>
-    <form id="form">
-      <input type="text" id="description" name="description" />
-      <input type="submit" value="Create" />
-    </form>
-    <div id="error" class="hidden">Something went wrong!</div>
-    <ul id="todos">
-      {% for todo in todos %}
-      <li>
-        <input class="check-completed" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked {% endif %} />
-        {{ todo.description }}
-        <button class="delete-button" data-id="{{ todo.id }}">&cross;</button>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
+
+
+
+
+                  <div class="todos-wrapper col-6">
+                    <h4>{{ active_list.name }}</h4>
+                    <form id="form">
+                      <input type="text" id="description" name="description" />
+                      <input type="submit" value="Create" class="btn btn-warning" />
+                    </form>
+                    <div id="error" class="hidden">Something went wrong!</div>
+                    <ul id="todos">
+                      {% for todo in todos %}
+                      <li>
+                        <input class="check-completed" data-id="{{ todo.id }}" type="checkbox" {% if todo.completed %} checked {% endif %} />
+                        {{ todo.description }}
+                        <button class="btn btn-danger delete-button" type="button" data-id="{{ todo.id }}">&cross;</button>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                
+                
+
+            </div>
+        </div>
 
 
 
@@ -46,12 +65,15 @@
             display: none;
         }
         li button{
-           color: red;
-           cursor: pointer;
+           margin-left:2em;
        }
+
     </style>
 
      <script>
+
+
+//delete
          const btn = document.querySelectorAll('.delete-button');
          for (i= 0; i < btn.length ; i++){
              const batin = btn[i];
@@ -68,6 +90,8 @@
 
 
 
+
+         //checkbox
 
          const checkb = document.querySelectorAll('.checky');
          for (i = 0; i < checkb.length ; i ++){
@@ -92,11 +116,34 @@
                                              }) 
              }
          }
+  
+
+
+         const listInput = document.getElementById('listUpdate');
+         document.getElementById('formList').onsubmit = function(e){
+             e.preventDefault();
+             listNew = listInput.value;
+             fetch('/todos/list/create',{
+                 method: 'POST',
+                 body: JSON.stringify({
+                     'list': listNew
+                 }),
+                 headers:{
+                     'Content-Type' : 'application/json'
+                 }
+             }).then(function(response){
+                 console.log(response)
+             })
+
+         }
+
+
+
+          //create
          const descInput = document.getElementById('description');
          document.getElementById('form').onsubmit = function(e){
              e.preventDefault();
              const desc = descInput.value;
-             descInput.value = '';
              fetch('/todos/create', {
                  method: 'POST',
                  body: JSON.stringify({
@@ -138,7 +185,6 @@
               
          }
      </script>
-
 
     </body>
 </html>
