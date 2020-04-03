@@ -29,6 +29,9 @@ class TodoList(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(), nullable=False)
     todos = db.relationship('Todo', backref='list', lazy=True)
+        
+    def __repr__(self):  # debugging repr method
+        return f'<Todo {self.id} {self.description}>'
 
 @app.route('/todos/create', methods=['POST'])
 def create_todo():
@@ -37,11 +40,13 @@ def create_todo():
     try:
         # request.get.json body json response
         description = request.get_json()['description']
-        todo = Todo(description=description)  # db update
+        list_id = request.get_json()['list_id']
+        todo = Todo(description=description, completed=False)
+        active_list = TodoList.query.get(list_id)
+        todo.list = active_list  # db update
         db.session.add(todo)
         db.session.commit()
-        body['description'] = todo.description
-    except:
+    except ValueError:
         error = True
         db.session.rollback()
     finally:
@@ -54,8 +59,19 @@ def create_todo():
 
 @app.route('/')
 def index():
-    # include data from data base
-    return render_template('index.html', data=Todo.query.all())
+    return redirect(url_for('list_number', todo_list=1))
+
+
+
+@app.route('/lists/<todo_list>')
+def list_number(todo_list):
+    return render_template('index.html', 
+    lists=TodoList.query.all(),
+    active_list=TodoList.query.get(todo_list),
+    todos=Todo.query.filter_by(todo_list=todo_list).order_by('id').all()
+    )
+
+
 
 
 @app.route('/todos/<todo_id>/set-completed', methods=['POST'])
